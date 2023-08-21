@@ -3,11 +3,6 @@ function createElement(elemType) {
     return document.createElement(elemType);
 }
 
-// Function to create image element
-// function createImageElement() {
-//     return document.createElement('img');
-// }
-
 // Function to add a CSS class to said HTML element
 function addClassToElement(elem, className) {
     elem.classList.add(className);
@@ -37,8 +32,15 @@ let cards = [];
 const drawDeck = [];
 const centerDeck = [];
 
+const playerTable = document.querySelector('player-table-container');
+
 // Selecting the Play Game Button element
-const playGameButtomElem = document.getElementById('playGame');
+const playGameButtonElem = document.getElementById('playGame');
+
+// Creating arrays for player hands
+const hiddenCards = [];
+const mainHand = [];
+const testArray = [];
 
 // Load game definitions and set up the Play Game button event
 function loadGame() {
@@ -52,11 +54,12 @@ function loadGame() {
     displayDrawDeck();
     displayCenterDeck();
 
-    playGameButtomElem.addEventListener('click', () => startGame());
+    playGameButtonElem.addEventListener('click', () => startGame());
 
     const drawDeckElem = document.querySelector('.card-pos-drawDeck');
 
     drawDeckElem.addEventListener('click', () => drawCard());
+
 }
 
 function startGame() {
@@ -67,6 +70,7 @@ function startGame() {
 function startRound() {
     console.log("Round hit");
     displayDrawDeck();
+    drawCards();
 }
 
 // Creating cards based on card definitions
@@ -192,32 +196,45 @@ function displayCenterDeck() {
 }
 
 // Draw a card from the draw deck and display it
-function drawCard() {
-    displayDrawDeck(); // Displaying the draw deck
-
-    const centerDeckElem = document.querySelector('.card-pos-centerDeck'); // Grabbing the center deck element
-
-    if (centerDeckElem.children.length > 0) {
-        // grabbing elements for the drawn card, both front and back
-        const drawnCard = centerDeckElem.children[0]; 
-        const cardFrontElem = drawnCard.querySelector('.card-front'); 
-        const cardBackElem = drawnCard.querySelector('.card-back'); 
-
-        cardBackElem.style.display = 'none'; // Hiding the back of the card
-        cardFrontElem.style.transform = 'rotateY(0deg)'; // Showing the front of the card
-
-        drawnCard.addEventListener('click', () => {
-            console.log("Interacting with drawn card");
-        });
-
-        console.log("I am drawn Card");
-        console.log(drawnCard);
+function drawCards() {
+    for (let i = 0; i < 3; i++) {
+        const card = drawDeck.pop();
+        if (card) {
+            hiddenCards.push(card);
+        } else {
+            console.log("Not enough cards to pop from drawDeck.");
+            break;
+        }
     }
+    for (let i = 0; i < 6; i++) {
+        const card = drawDeck.pop();
+        if (card) {
+            mainHand.push(card);
+        } else {
+            console.log("Not enough cards to pop from drawDeck.");
+            break;
+        }
+    }
+    console.log("Cards drawn and distributed.");
+    displayHiddenCards();
+    displayMainHand();
+}
 
-    console.log("Card Drawn");
-    console.log(drawDeck);
-    console.log("I am center deck");
-    console.log(centerDeck);
+function displayHiddenCards() {
+    const reserveHandElem = document.querySelector('.reserve-hand-container');
+
+    hiddenCards.forEach((card) => {
+        reserveHandElem.appendChild(card);
+    });
+}
+
+function displayMainHand() {
+    const mainHandElem = document.querySelector('.main-hand-container');
+
+    mainHand.forEach((card) => {
+        console.log(mainHandElem, "MainHandElem")
+        mainHandElem.appendChild(card);
+    });
 }
 
 loadGame();
