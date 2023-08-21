@@ -245,8 +245,17 @@ function displayMainHand() {
             return currentSlot.childElementCount < minSlot.childElementCount ? currentSlot : minSlot;
         }, cardSlots[0]);
 
+        const cardBackElem = card.querySelector('.card-back');
+        cardBackElem.style.display = 'none';
+
+        const existingCards = minCardsSlot.childElementCount;
+        const marginTopIncrement = -185;
+
+        card.style.marginTop = `${existingCards * marginTopIncrement}px`;
+
         minCardsSlot.appendChild(card);
     });
 }
+
 
 loadGame();
