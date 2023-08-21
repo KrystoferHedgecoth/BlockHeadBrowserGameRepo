@@ -231,9 +231,21 @@ function displayHiddenCards() {
 function displayMainHand() {
     const mainHandElem = document.querySelector('.main-hand-container');
 
+    const cardSlots = [
+        mainHandElem.querySelector('.card-slot-one'),
+        mainHandElem.querySelector('.card-slot-two'),
+        mainHandElem.querySelector('.card-slot-three'),
+        mainHandElem.querySelector('.card-slot-four'),
+        mainHandElem.querySelector('.card-slot-five'),
+        mainHandElem.querySelector('.card-slot-six')
+    ];
+
     mainHand.forEach((card) => {
-        console.log(mainHandElem, "MainHandElem")
-        mainHandElem.appendChild(card);
+        const minCardsSlot = cardSlots.reduce((minSlot, currentSlot) => {
+            return currentSlot.childElementCount < minSlot.childElementCount ? currentSlot : minSlot;
+        }, cardSlots[0]);
+
+        minCardsSlot.appendChild(card);
     });
 }
 
