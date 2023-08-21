@@ -248,14 +248,21 @@ function displayMainHand() {
         const cardBackElem = card.querySelector('.card-back');
         cardBackElem.style.display = 'none';
 
-        const existingCards = minCardsSlot.childElementCount;
-        const marginTopIncrement = -185;
+        const cardFrontElem = card.querySelector(".card-front")
 
-        card.style.marginTop = `${existingCards * marginTopIncrement}px`;
+        const existingCards = minCardsSlot.childElementCount;
+        const marginTopIncrement = -182; // Adjust this value based on your preference
+
+        // Calculate the marginTop for the current card
+        const marginTop =  existingCards * marginTopIncrement;
+
+        // Set the marginTop for the card
+        cardFrontElem.style.marginTop = `${marginTop}px`;
 
         minCardsSlot.appendChild(card);
     });
 }
+
 
 
 loadGame();
