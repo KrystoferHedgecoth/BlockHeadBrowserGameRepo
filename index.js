@@ -197,6 +197,8 @@ function displayCenterDeck() {
 
 // Draw a card from the draw deck and display it
 function drawCards() {
+
+    // Draws three cards and assigns them to reserve hand (hiddenCards)
     for (let i = 0; i < 3; i++) {
         const card = drawDeck.pop();
         if (card) {
@@ -206,6 +208,7 @@ function drawCards() {
             break;
         }
     }
+    // Draws six cards and assigns them to the mainHand
     for (let i = 0; i < 6; i++) {
         const card = drawDeck.pop();
         if (card) {
@@ -215,11 +218,14 @@ function drawCards() {
             break;
         }
     }
+
+    // Calls display functions
     console.log("Cards drawn and distributed.");
     displayHiddenCards();
     displayMainHand();
 }
 
+// Displays a backImage for every hidden card in the array 
 function displayHiddenCards() {
     const reserveHandElem = document.querySelector('.reserve-hand-container');
 
@@ -229,15 +235,21 @@ function displayHiddenCards() {
 }
 
 function cardValue(card) {
+    // Assigning the order of the cards
     const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+    // Slicing off the SUIT of the card to get the value
     return values.indexOf(card.id.slice(0, -1));
   }
 
+  // Sorting cards least to greatest
   function sortCards(cards) {
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
   }
 
+//   Displays mainHand array in order from least to greatest, with similar cards grouped
   function displayMainHand() {
+    // Sorting Cards
     sortCards(mainHand);
     console.log(mainHand);
 
@@ -270,12 +282,14 @@ function cardValue(card) {
         cardBackElem.style.display = 'none';
 
         const cardFrontElem = card.querySelector(".card-front");
-
+        // Calculate the margin top for the card's position within the slot
         const marginTopIncrement = -182;
         const marginTop = cardSlots[currentSlotIndex].childElementCount * marginTopIncrement;
-
+        
+        // Apply the calculated margin top to the card elem
         cardFrontElem.style.marginTop = `${marginTop}px`;
 
+        // Append the card to the current slot
         cardSlots[currentSlotIndex].appendChild(card);
     });
 }
