@@ -220,29 +220,37 @@ function drawCards() {
     displayMainHand();
 }
 
+// This function displays hidden cards by appending them to the reserve hand container
 function displayHiddenCards() {
     const reserveHandElem = document.querySelector('.reserve-hand-container');
 
+    // Iterate through hiddenCards array and append each card to the container
     hiddenCards.forEach((card) => {
         reserveHandElem.appendChild(card);
     });
 }
 
+// This function assigns a numerical value to a card based on its ID
 function cardValue(card) {
     const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
     return values.indexOf(card.id.slice(0, -1));
-  }
+}
 
-  function sortCards(cards) {
+// This function sorts an array of cards based on their values
+function sortCards(cards) {
+    // Use the cardValue function to compare card values for sorting
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
-  }
+}
 
-  function displayMainHand() {
+// This function displays the main hand of cards
+function displayMainHand() {
+    // Sort the main hand array using the sortCards function
     sortCards(mainHand);
     console.log(mainHand);
 
     const mainHandElem = document.querySelector('.main-hand-container');
 
+    // Array of card slot elements in the main hand container
     const cardSlots = [
         mainHandElem.querySelector('.card-slot-one'),
         mainHandElem.querySelector('.card-slot-two'),
@@ -252,17 +260,20 @@ function cardValue(card) {
         mainHandElem.querySelector('.card-slot-six')
     ];
 
-    let currentSlotIndex = 0; // Start with the first slot
+    let currentSlotIndex = 0;
 
+    // Iterate through the mainHand array
     mainHand.forEach((card) => {
-        const cardValue = card.id.slice(0, -1); // Extract value from card id
+        const cardValue = card.id.slice(0, -1);
 
-        // If the slot is not empty and the card's value is different from the last card placed in the slot, move to the next slot
+        // Check if the current card slot is occupied
         if (cardSlots[currentSlotIndex].childElementCount > 0) {
             const lastCardInSlot = cardSlots[currentSlotIndex].lastElementChild;
             const lastCardValue = lastCardInSlot.id.slice(0, -1);
+
+            // If the current card's value is different from the last card's value in the slot, switch to the next slot
             if (cardValue !== lastCardValue) {
-                currentSlotIndex = (currentSlotIndex + 1) % cardSlots.length; // Move to the next slot
+                currentSlotIndex = (currentSlotIndex + 1) % cardSlots.length;
             }
         }
 
@@ -271,14 +282,18 @@ function cardValue(card) {
 
         const cardFrontElem = card.querySelector(".card-front");
 
+        // Calculate the margin top for the card's position within the slot
         const marginTopIncrement = -182;
         const marginTop = cardSlots[currentSlotIndex].childElementCount * marginTopIncrement;
 
+        // Apply the calculated margin top to the card element
         cardFrontElem.style.marginTop = `${marginTop}px`;
 
+        // Append the card to the current slot
         cardSlots[currentSlotIndex].appendChild(card);
     });
 }
+
 
 
 
