@@ -229,23 +229,25 @@ function drawCards() {
 function displayHiddenCards() {
     const reserveHandElem = document.querySelector('.reserve-hand-container');
 
+    // Iterate through hiddenCards array and append each card to the container
     hiddenCards.forEach((card) => {
         reserveHandElem.appendChild(card);
     });
 }
 
+// This function assigns a numerical value to a card based on its ID
 function cardValue(card) {
     // Assigning the order of the cards
     const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
     // Slicing off the SUIT of the card to get the value
     return values.indexOf(card.id.slice(0, -1));
-  }
+}
 
   // Sorting cards least to greatest
   function sortCards(cards) {
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
-  }
+}
 
 //   Displays mainHand array in order from least to greatest, with similar cards grouped
   function displayMainHand() {
@@ -255,6 +257,7 @@ function cardValue(card) {
 
     const mainHandElem = document.querySelector('.main-hand-container');
 
+    // Array of card slot elements in the main hand container
     const cardSlots = [
         mainHandElem.querySelector('.card-slot-one'),
         mainHandElem.querySelector('.card-slot-two'),
@@ -264,17 +267,20 @@ function cardValue(card) {
         mainHandElem.querySelector('.card-slot-six')
     ];
 
-    let currentSlotIndex = 0; // Start with the first slot
+    let currentSlotIndex = 0;
 
+    // Iterate through the mainHand array
     mainHand.forEach((card) => {
-        const cardValue = card.id.slice(0, -1); // Extract value from card id
+        const cardValue = card.id.slice(0, -1);
 
-        // If the slot is not empty and the card's value is different from the last card placed in the slot, move to the next slot
+        // Check if the current card slot is occupied
         if (cardSlots[currentSlotIndex].childElementCount > 0) {
             const lastCardInSlot = cardSlots[currentSlotIndex].lastElementChild;
             const lastCardValue = lastCardInSlot.id.slice(0, -1);
+
+            // If the current card's value is different from the last card's value in the slot, switch to the next slot
             if (cardValue !== lastCardValue) {
-                currentSlotIndex = (currentSlotIndex + 1) % cardSlots.length; // Move to the next slot
+                currentSlotIndex = (currentSlotIndex + 1) % cardSlots.length;
             }
         }
 
