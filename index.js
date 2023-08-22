@@ -206,7 +206,7 @@ function drawCards() {
             break;
         }
     }
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 17; i++) {
         const card = drawDeck.pop();
         if (card) {
             mainHand.push(card);
