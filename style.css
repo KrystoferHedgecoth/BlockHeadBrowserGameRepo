@@ -49,10 +49,8 @@ main{
     margin: 0 30px;
 }
 .card-pos-centerDeck {
-    background-color: blue;
 }
 .card-pos-trashDeck {
-    background-color: red;
 }
 /* Style for each individual card */
 .card{
