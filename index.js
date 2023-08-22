@@ -251,7 +251,7 @@ function displayMainHand() {
         const cardFrontElem = card.querySelector(".card-front")
 
         const existingCards = minCardsSlot.childElementCount;
-        const marginTopIncrement = -182; // Adjust this value based on your preference
+        const marginTopIncrement = -182;
 
         // Calculate the marginTop for the current card
         const marginTop =  existingCards * marginTopIncrement;
