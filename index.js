@@ -55,11 +55,6 @@ function loadGame() {
     displayCenterDeck();
 
     playGameButtonElem.addEventListener('click', () => startGame());
-
-    // const drawDeckElem = document.querySelector('.card-pos-drawDeck');
-
-    // drawDeckElem.addEventListener('click', () => drawCard());
-
 }
 
 function startGame() {
