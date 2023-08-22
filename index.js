@@ -206,7 +206,7 @@ function drawCards() {
             break;
         }
     }
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 17; i++) {
         const card = drawDeck.pop();
         if (card) {
             mainHand.push(card);
@@ -228,7 +228,20 @@ function displayHiddenCards() {
     });
 }
 
+function cardValue(card) {
+    const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+    return values.indexOf(card.id.slice(0, -1));
+  }
+
+  function sortCards(cards) {
+    return cards.sort((a, b) => cardValue(a) - cardValue(b));
+  }
+
 function displayMainHand() {
+
+    sortCards(mainHand);
+    console.log(mainHand);
+
     const mainHandElem = document.querySelector('.main-hand-container');
 
     const cardSlots = [
