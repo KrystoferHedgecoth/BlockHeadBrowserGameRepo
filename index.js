@@ -206,7 +206,7 @@ function drawCards() {
             break;
         }
     }
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < 6; i++) {
         const card = drawDeck.pop();
         if (card) {
             mainHand.push(card);
@@ -237,8 +237,7 @@ function cardValue(card) {
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
   }
 
-function displayMainHand() {
-
+  function displayMainHand() {
     sortCards(mainHand);
     console.log(mainHand);
 
@@ -253,28 +252,36 @@ function displayMainHand() {
         mainHandElem.querySelector('.card-slot-six')
     ];
 
+    let currentSlotIndex = 0; // Start with the first slot
+
     mainHand.forEach((card) => {
-        const minCardsSlot = cardSlots.reduce((minSlot, currentSlot) => {
-            return currentSlot.childElementCount < minSlot.childElementCount ? currentSlot : minSlot;
-        }, cardSlots[0]);
+        const cardValue = card.id.slice(0, -1); // Extract value from card id
+
+        // If the slot is not empty and the card's value is different from the last card placed in the slot, move to the next slot
+        if (cardSlots[currentSlotIndex].childElementCount > 0) {
+            const lastCardInSlot = cardSlots[currentSlotIndex].lastElementChild;
+            const lastCardValue = lastCardInSlot.id.slice(0, -1);
+            if (cardValue !== lastCardValue) {
+                currentSlotIndex = (currentSlotIndex + 1) % cardSlots.length; // Move to the next slot
+            }
+        }
 
         const cardBackElem = card.querySelector('.card-back');
         cardBackElem.style.display = 'none';
 
-        const cardFrontElem = card.querySelector(".card-front")
+        const cardFrontElem = card.querySelector(".card-front");
 
-        const existingCards = minCardsSlot.childElementCount;
         const marginTopIncrement = -182;
+        const marginTop = cardSlots[currentSlotIndex].childElementCount * marginTopIncrement;
 
-        // Calculate the marginTop for the current card
-        const marginTop =  existingCards * marginTopIncrement;
-
-        // Set the marginTop for the card
         cardFrontElem.style.marginTop = `${marginTop}px`;
 
-        minCardsSlot.appendChild(card);
+        cardSlots[currentSlotIndex].appendChild(card);
     });
 }
+
+
+
 
 
 
