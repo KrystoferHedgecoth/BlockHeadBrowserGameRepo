@@ -56,9 +56,9 @@ function loadGame() {
 
     playGameButtonElem.addEventListener('click', () => startGame());
 
-    const drawDeckElem = document.querySelector('.card-pos-drawDeck');
+    // const drawDeckElem = document.querySelector('.card-pos-drawDeck');
 
-    drawDeckElem.addEventListener('click', () => drawCard());
+    // drawDeckElem.addEventListener('click', () => drawCard());
 
 }
 
@@ -174,10 +174,10 @@ function displayDrawDeck() {
 
         const cardBackImg = cardInnerElem.querySelector('.card-back'); // Grabbing the back image element
         cardBackImg.addEventListener('click', () => {
-            centerDeck.push(drawDeck.pop()); // Moving the top card from draw deck to center deck
+            mainHand.push(drawDeck.pop()); // Moving the top card from draw deck to center deck
             // Updating displays
             displayDrawDeck();
-            displayCenterDeck();
+            displayMainHand();
         });
 
         drawDeckElem.appendChild(drawnCard); // Displaying the cloned card in the draw deck element
@@ -186,17 +186,26 @@ function displayDrawDeck() {
 
 // Display the top card from the center deck
 function displayCenterDeck() {
-    const centerDeckElem = document.querySelector('.card-pos-centerDeck'); // Grabbing the center deck element
-    centerDeckElem.innerHTML = ''; // Clear the center deck element
+    const centerDeckElem = document.querySelector('.card-pos-centerDeck');
+    centerDeckElem.innerHTML = '';
 
     if (centerDeck.length > 0) {
         const displayedCard = centerDeck[centerDeck.length - 1].cloneNode(true);
-        centerDeckElem.appendChild(displayedCard); // Display the cloned card in the center deck element
+        
+        // Reset margin and positioning for displayed card
+        const cardFrontElem = displayedCard.querySelector('.card-front');
+        cardFrontElem.style.marginTop = '0'; // Reset margin-top
+        cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
+
+        centerDeckElem.appendChild(displayedCard);
     }
 }
 
+
 // Draw a card from the draw deck and display it
 function drawCards() {
+
+    // Draws three cards and assigns them to reserve hand (hiddenCards)
     for (let i = 0; i < 3; i++) {
         const card = drawDeck.pop();
         if (card) {
@@ -206,6 +215,7 @@ function drawCards() {
             break;
         }
     }
+    // Draws six cards and assigns them to the mainHand
     for (let i = 0; i < 6; i++) {
         const card = drawDeck.pop();
         if (card) {
@@ -215,12 +225,14 @@ function drawCards() {
             break;
         }
     }
+
+    // Calls display functions
     console.log("Cards drawn and distributed.");
     displayHiddenCards();
     displayMainHand();
 }
 
-// This function displays hidden cards by appending them to the reserve hand container
+// Displays a backImage for every hidden card in the array 
 function displayHiddenCards() {
     const reserveHandElem = document.querySelector('.reserve-hand-container');
 
@@ -232,21 +244,23 @@ function displayHiddenCards() {
 
 // This function assigns a numerical value to a card based on its ID
 function cardValue(card) {
+    // Assigning the order of the cards
     const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+    // Slicing off the SUIT of the card to get the value
     return values.indexOf(card.id.slice(0, -1));
 }
 
-// This function sorts an array of cards based on their values
-function sortCards(cards) {
-    // Use the cardValue function to compare card values for sorting
+  // Sorting cards least to greatest
+  function sortCards(cards) {
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
 }
 
-// This function displays the main hand of cards
-function displayMainHand() {
-    // Sort the main hand array using the sortCards function
+//   Displays mainHand array in order from least to greatest, with similar cards grouped
+  function displayMainHand() {
+    // Sorting Cards
+    clearMainHandSlots();
     sortCards(mainHand);
-    console.log(mainHand);
 
     const mainHandElem = document.querySelector('.main-hand-container');
 
@@ -281,20 +295,74 @@ function displayMainHand() {
         cardBackElem.style.display = 'none';
 
         const cardFrontElem = card.querySelector(".card-front");
-
         // Calculate the margin top for the card's position within the slot
         const marginTopIncrement = -182;
         const marginTop = cardSlots[currentSlotIndex].childElementCount * marginTopIncrement;
-
-        // Apply the calculated margin top to the card element
+        
+        // Apply the calculated margin top to the card elem
         cardFrontElem.style.marginTop = `${marginTop}px`;
 
         // Append the card to the current slot
         cardSlots[currentSlotIndex].appendChild(card);
     });
+
+    mainHand.forEach((card) => {
+        const cardFrontElem = card.querySelector('.card-front');
+    
+        // Add a click event listener to the front card image
+        cardFrontElem.addEventListener('click', () => {
+            drawCardFromMainHand(card);
+        });
+    });
+    
+
+    console.log("Display Updated, current array:", mainHand);
+
+}
+
+function drawCardFromMainHand(cardId) {
+    // Find the index of the card with the matching ID in mainHand
+    const cardIndex = mainHand.findIndex(card => card === cardId);
+
+    if (cardIndex !== -1) {
+        // Remove the card from mainHand using the found index
+        const removedCard = mainHand.splice(cardIndex, 1)[0]; // Splice returns an array, so we take the first (and only) element
+
+        // Push the removed card to centerDeck
+        centerDeck.push(removedCard);
+
+        // Update the UI
+        displayCenterDeck();
+        displayMainHand();
+    } else {
+        console.log("Card not found in mainHand.");
+    }
+}
+
+
+function clearMainHandSlots() {
+    const mainHandElem = document.querySelector('.main-hand-container');
+
+    // clear all card slots before proceeding
+    const cardSlots = [
+        mainHandElem.querySelector('.card-slot-one'),
+        mainHandElem.querySelector('.card-slot-two'),
+        mainHandElem.querySelector('.card-slot-three'),
+        mainHandElem.querySelector('.card-slot-four'),
+        mainHandElem.querySelector('.card-slot-five'),
+        mainHandElem.querySelector('.card-slot-six')
+    ];
+
+    cardSlots.forEach(slot => {
+        while (slot.firstChild){
+            slot.removeChild(slot.firstChild);
+        }
+    })
 }
 
 // Test issue pushing
+
+
 
 
 

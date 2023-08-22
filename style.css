@@ -48,12 +48,6 @@ main{
     border: black 1px;
     margin: 0 30px;
 }
-.card-pos-centerDeck {
-    background-color: blue;
-}
-.card-pos-trashDeck {
-    background-color: red;
-}
 /* Style for each individual card */
 .card{
     height:var(--card-height);
