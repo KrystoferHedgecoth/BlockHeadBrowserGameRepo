@@ -42,6 +42,9 @@ const hiddenCards = [];
 const mainHand = [];
 const testArray = [];
 
+// currentPhase is the phase of the game. (0: Reserve Hand Phase, 1: Play Phase)
+let currentPhase = 0 
+
 // Load game definitions and set up the Play Game button event
 function loadGame() {
     fetch('cardDefinitions.json')
@@ -169,10 +172,15 @@ function displayDrawDeck() {
 
         const cardBackImg = cardInnerElem.querySelector('.card-back'); // Grabbing the back image element
         cardBackImg.addEventListener('click', () => {
-            mainHand.push(drawDeck.pop()); // Moving the top card from draw deck to center deck
-            // Updating displays
-            displayDrawDeck();
-            displayMainHand();
+            if (mainHand.length < 3) {
+                mainHand.push(drawDeck.pop()); // Moving the top card from draw deck to center deck
+                // Updating displays
+                displayDrawDeck();
+                displayMainHand();
+            } else {
+                console.log("own too many cards to draw");
+            }
+
         });
 
         drawDeckElem.appendChild(drawnCard); // Displaying the cloned card in the draw deck element
@@ -306,7 +314,14 @@ function cardValue(card) {
     
         // Add a click event listener to the front card image
         cardFrontElem.addEventListener('click', () => {
-            drawCardFromMainHand(card);
+            if (drawDeck.length === 0) {
+                drawCardFromMainHand(card);
+            } else if(mainHand.length >=3){
+                drawCardFromMainHand(card);
+            } else {
+                console.log("Must draw a card to continue");
+            }
+
         });
     });
     
@@ -316,15 +331,42 @@ function cardValue(card) {
 }
 
 function drawCardFromMainHand(cardId) {
+
+    console.log("This is hidden hand", hiddenCards)
     // Find the index of the card with the matching ID in mainHand
     const cardIndex = mainHand.findIndex(card => card === cardId);
 
     if (cardIndex !== -1) {
         // Remove the card from mainHand using the found index
-        const removedCard = mainHand.splice(cardIndex, 1)[0]; // Splice returns an array, so we take the first (and only) element
+        const removedCard = mainHand.splice(cardIndex, 1)[0];
+         // Splice returns an array, so we take the first (and only) element
+        if (currentPhase === 0) {
+            if (hiddenCards.length <5) {
+            // Push the removed card to centerDeck
+                const cardFrontElem = cardId.querySelector('.card-front');
 
-        // Push the removed card to centerDeck
-        centerDeck.push(removedCard);
+                cardFrontElem.style.marginTop = '0'; // Reset margin-top
+                cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
+
+                hiddenCards.push(removedCard);
+                displayHiddenCards();
+            } else {
+                const cardFrontElem = cardId.querySelector('.card-front');
+
+                cardFrontElem.style.marginTop = '0'; // Reset margin-top
+                cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
+    
+                hiddenCards.push(removedCard);
+                displayHiddenCards();
+
+                currentPhase = 1
+            }
+
+        } else {
+            centerDeck.push(removedCard);
+            
+        }
+        
 
         // Update the UI
         displayCenterDeck();
@@ -354,13 +396,6 @@ function clearMainHandSlots() {
         }
     })
 }
-
-// Test issue pushing
-
-
-
-
-
 
 
 loadGame();
