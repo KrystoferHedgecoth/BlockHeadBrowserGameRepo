@@ -212,6 +212,10 @@ function displayCenterDeck() {
         cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
 
         centerDeckElem.appendChild(displayedCard);
+
+        isNonFive();
+
+        console.log("I am center deck", centerDeck);
     }
 }
 
@@ -321,7 +325,6 @@ function cardValue(card) {
 
     mainHand.forEach((card) => {
         const cardFrontElem = card.querySelector('.card-front');
-    
         // Add a click event listener to the front card image
         cardFrontElem.addEventListener('click', () => {
             if (drawDeck.length === 0) {
@@ -339,6 +342,21 @@ function cardValue(card) {
         });
     });
 }
+
+function isNonFive() {
+    for (let i = centerDeck.length - 1; i >= 0; i--) {
+        if (cardValue(centerDeck[i]) !== 3) {
+            console.log("I am non-5", cardValue(centerDeck[i]));
+            return cardValue(centerDeck[i]); // Found a non-5 card, return its value
+        }
+    }
+    
+    console.log("No non-5 found");
+    return 0; // No non-5 card found, return 0
+}
+
+
+
 
 function drawCardFromMainHand(cardId) {
     // Find the index of the card with the matching ID in mainHand
@@ -417,10 +435,7 @@ function cardPlayability(card) {
     let lastCardValue = "0";
 
     if (centerDeck.length > 0) {
-        let lastCard = centerDeck[centerDeck.length - 1];
-        lastCardValue = cardValue(lastCard);
-    } else {
-        lastCardValue = "0";
+        lastCardValue = isNonFive();
     }
 
     if (currentPhase === 0) {
@@ -428,7 +443,6 @@ function cardPlayability(card) {
         return true;
     } else if (currentPhase === 1) {
         if (centerDeck.length > 0) {
-            let topCardValue = cardValue(centerDeck[centerDeck.length - 1]);
 
             // Check if the top card is a 5
             if (playedCardValue === values.indexOf("5")) {
@@ -447,19 +461,6 @@ function cardPlayability(card) {
                 // Check if the new card is below or equal to a 7
                 return playedCardValue <= values.indexOf("7");
             }
-
-            const lastIndex = centerDeck.lastIndexOf(values.indexOf("5"));
-            if (lastIndex >= 0) {
-                // Iterate through the centerDeck until you find a non-"5" card
-                for (let i = centerDeck.length - 1; i >= 0; i--) {
-                    if (cardValue(centerDeck[i]) !== values.indexOf("5") && playedCardValue >= cardValue(centerDeck[i])) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
-
             // Check if the played card can be played in relation to the last card value
             return playedCardValue >= lastCardValue;
         } else {
@@ -497,6 +498,20 @@ function blowUpDeck() {
         garbageDeck.push(card);
         displayMainHand();
         displayCenterDeck();
+    }
+    displayTrashDeck();
+}
+
+function displayTrashDeck() {
+    const trashDeckElem = document.querySelector('.card-pos-trashDeck'); // Get the draw deck element
+    trashDeckElem.innerHTML = ''; // Clear the draw deck element
+
+    if (drawDeck.length > 0) {
+        const drawnCard = drawDeck[drawDeck.length - 1].cloneNode(true); // Clone the top card from the draw deck
+        const cardInnerElem = drawnCard.querySelector('.card-inner'); // Get the inner element of the cloned card
+
+        cardInnerElem.style.transform = 'rotateY(0deg)'; // Showing the front of the card
+        trashDeckElem.appendChild(drawnCard); // Displaying the cloned card in the draw deck element
     }
 }
 
