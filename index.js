@@ -40,10 +40,12 @@ const playGameButtonElem = document.getElementById('playGame');
 // Creating arrays for player hands
 const hiddenCards = [];
 const mainHand = [];
-const testArray = [];
+const garbageDeck = [];
 
 // currentPhase is the phase of the game. (0: Reserve Hand Phase, 1: Play Phase)
 let currentPhase = 0 
+
+const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
 // Load game definitions and set up the Play Game button event
 function loadGame() {
@@ -180,6 +182,14 @@ function displayDrawDeck() {
             } else {
                 console.log("own too many cards to draw");
             }
+            if (hasPlayableCards(mainHand)) {
+                console.log("You have playable cards");
+            } else {
+                pickUpDeck();
+                console.log("picked up centerDeck");
+                displayMainHand();
+                displayCenterDeck();
+            }
 
         });
 
@@ -189,6 +199,7 @@ function displayDrawDeck() {
 
 // Display the top card from the center deck
 function displayCenterDeck() {
+
     const centerDeckElem = document.querySelector('.card-pos-centerDeck');
     centerDeckElem.innerHTML = '';
 
@@ -248,7 +259,6 @@ function displayHiddenCards() {
 // This function assigns a numerical value to a card based on its ID
 function cardValue(card) {
     // Assigning the order of the cards
-    const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 
     // Slicing off the SUIT of the card to get the value
     return values.indexOf(card.id.slice(0, -1));
@@ -317,22 +327,20 @@ function cardValue(card) {
             if (drawDeck.length === 0) {
                 drawCardFromMainHand(card);
             } else if(mainHand.length >=3){
-                drawCardFromMainHand(card);
+                if (cardPlayability(card)) {
+                    drawCardFromMainHand(card);
+                } else {
+                    console.log("card cannot be played");
+                }
             } else {
                 console.log("Must draw a card to continue");
             }
 
         });
     });
-    
-
-    console.log("Display Updated, current array:", mainHand);
-
 }
 
 function drawCardFromMainHand(cardId) {
-
-    console.log("This is hidden hand", hiddenCards)
     // Find the index of the card with the matching ID in mainHand
     const cardIndex = mainHand.findIndex(card => card === cardId);
 
@@ -364,6 +372,11 @@ function drawCardFromMainHand(cardId) {
 
         } else {
             centerDeck.push(removedCard);
+
+            if (cardValue(removedCard) === values.indexOf("10")) {
+                blowUpDeck();
+                displayCenterDeck;
+            }
             
         }
         
@@ -397,5 +410,94 @@ function clearMainHandSlots() {
     })
 }
 
+// Function to check if a card can be played
+function cardPlayability(card) {
+    const playedCardValue = cardValue(card);
+
+    let lastCardValue = "0";
+
+    if (centerDeck.length > 0) {
+        let lastCard = centerDeck[centerDeck.length - 1];
+        lastCardValue = cardValue(lastCard);
+    } else {
+        lastCardValue = "0";
+    }
+
+    if (currentPhase === 0) {
+        // In Reserve Hand Phase, any card can be played
+        return true;
+    } else if (currentPhase === 1) {
+        if (centerDeck.length > 0) {
+            let topCardValue = cardValue(centerDeck[centerDeck.length - 1]);
+
+            // Check if the top card is a 5
+            if (playedCardValue === values.indexOf("5")) {
+                return true; // A 5 can be played on any card
+            }
+
+            if (playedCardValue === values.indexOf("2")) {
+                return true;
+            }
+
+            if (playedCardValue === values.indexOf("10")) {
+                return true;
+            }
+
+            if (lastCardValue === values.indexOf("7")) {
+                // Check if the new card is below or equal to a 7
+                return playedCardValue <= values.indexOf("7");
+            }
+
+            const lastIndex = centerDeck.lastIndexOf(values.indexOf("5"));
+            if (lastIndex >= 0) {
+                // Iterate through the centerDeck until you find a non-"5" card
+                for (let i = centerDeck.length - 1; i >= 0; i--) {
+                    if (cardValue(centerDeck[i]) !== values.indexOf("5") && playedCardValue >= cardValue(centerDeck[i])) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+            // Check if the played card can be played in relation to the last card value
+            return playedCardValue >= lastCardValue;
+        } else {
+            // If centerDeck is empty, any card can be played in the Play Phase
+            return true;
+        }
+    }
+
+    // Default case (shouldn't reach here)
+    return false;
+}
+
+//Checks if there are any playable cards (returns true or false)
+function hasPlayableCards(mainHand) {
+    for (let i = 0; i < mainHand.length; i++) {
+        if (cardPlayability(mainHand[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Move cards from the center deck to the main hand
+function pickUpDeck() {
+    while (centerDeck.length > 0) {
+        const card = centerDeck.pop();
+        mainHand.push(card);
+        displayMainHand();
+    }
+}
+// Move cards from the center deck to the garbage deck
+function blowUpDeck() {
+    while (centerDeck.length > 0) {
+        const card = centerDeck.pop();
+        garbageDeck.push(card);
+        displayMainHand();
+        displayCenterDeck();
+    }
+}
 
 loadGame();
