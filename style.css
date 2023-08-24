@@ -34,6 +34,7 @@ header {
 }
 /* Style for the primary content container */
 main{
+    background-color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -47,19 +48,13 @@ main{
     border: black 1px;
     margin: 0 30px;
 }
-.card-pos-centerDeck {
-    background-color: blue;
-}
-.card-pos-trashDeck {
-    background-color: red;
-}
 /* Style for each individual card */
 .card{
-    position:absolute;
     height:var(--card-height);
     width:var(--card-width);
-    perspective: 1000px;
+    perspective: 100px;
     cursor: pointer;
+    margin-left: 1rem;
 }
 /* Inner container for card's content, with a 3d transform */
 .card-inner{
@@ -82,4 +77,34 @@ main{
 .card-img,.cardBack-img {
     height: 100%;
     width: 100%;
+}
+
+.player-table-container {
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    bottom: 10px;
+    height: 350px;
+}
+
+.reserve-hand-container {
+ height: 20%;
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ padding: 10px;
+ margin-bottom: 2px;
+}
+
+.main-hand-container {
+    flex-flow: row;
+    display: flex;
+    justify-content: space-evenly;
+    flex-grow: 1;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
 }
