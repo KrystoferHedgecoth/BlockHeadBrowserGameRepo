@@ -94,7 +94,7 @@ main{
  height: 20%;
  width: 100%;
  display: flex;
- justify-content: center;
+ justify-content: space-evenly;
  padding: 10px;
  margin-bottom: 2px;
 }

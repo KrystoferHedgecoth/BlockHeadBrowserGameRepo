@@ -39,6 +39,7 @@ const playGameButtonElem = document.getElementById('playGame');
 
 // Creating arrays for player hands
 const hiddenCards = [];
+const reserveCards = [];
 const mainHand = [];
 const garbageDeck = [];
 
@@ -71,6 +72,7 @@ function startRound() {
     console.log("Round hit");
     displayDrawDeck();
     drawCards();
+    // DestroyDrawDeck();
 }
 
 // Creating cards based on card definitions
@@ -251,12 +253,108 @@ function drawCards() {
 }
 
 // Displays a backImage for every hidden card in the array 
+// Display hidden cards and allow moving them to the main hand
 function displayHiddenCards() {
     const reserveHandElem = document.querySelector('.reserve-hand-container');
+    const hiddenCardSlots = [
+        reserveHandElem.querySelector('.h-card-slot-one'),
+        reserveHandElem.querySelector('.h-card-slot-two'),
+        reserveHandElem.querySelector('.h-card-slot-three')
+    ];
 
-    // Iterate through hiddenCards array and append each card to the container
-    hiddenCards.forEach((card) => {
-        reserveHandElem.appendChild(card);
+    hiddenCards.forEach((card, index) => {
+        // Append the card to the current slot
+        hiddenCardSlots[index].appendChild(card);
+
+        // Add a click event listener to the card
+        card.addEventListener('click', () => {
+            // Do something when the hidden card is clicked
+            console.log(`Hidden Card ${index + 1} clicked!`);
+
+            if (drawDeck.length === 0) {
+                if (reserveCards.length === 0 && mainHand.length === 0) {
+                    // Clone the clicked card
+                    const clickedCardClone = card.cloneNode(true);
+
+                    // Remove the original card from the UI and array
+                    hiddenCardSlots[index].removeChild(card);
+                    hiddenCards.splice(index, 1);
+
+                    // Push the clone to the mainHand array
+                    mainHand.push(clickedCardClone);
+
+                    // Update UI
+                    displayMainHand();
+                    displayHiddenCards();
+                    if (hasPlayableCards(mainHand)) {
+                        console.log("you have playable cards");
+                    } else {
+                        setTimeout(() => {
+                            pickUpDeck();
+                            console.log("Picked up deck");
+                            displayCenterDeck();
+                        }, 500);
+                    }
+                } else {
+                    console.log("Can't play this card right now");
+                }
+            }
+        });
+    });
+
+    const shownCardSlots = [
+        reserveHandElem.querySelector('.shown-slot-one'),
+        reserveHandElem.querySelector('.shown-slot-two'),
+        reserveHandElem.querySelector('.shown-slot-three')
+    ];
+
+    reserveCards.forEach((card, index) => {
+        // Append the card to the current slot
+        shownCardSlots[index].appendChild(card);
+
+        // Add a click event listener to the card
+        if (drawDeck.length === 0 && mainHand.length === 1) {
+            if (hasPlayableCards(reserveCards)) {
+                console.log("Has playable cards")
+            } else {
+
+                setTimeout(() => {
+                pickUpDeck();
+                console.log("Picked up deck");
+                displayCenterDeck();
+                }, 1000);
+
+            }
+        }
+        if (drawDeck.length === 0 && mainHand.length === 0) {
+            if (hasPlayableCards(reserveCards)) {
+                console.log("Has playable cards")
+            } else {
+                pickUpDeck();
+                console.log("Picked up deck");
+            }
+        }
+        card.addEventListener('click', () => {
+            if (drawDeck.length === 0) {
+                if (mainHand.length === 0) {
+                    // Clone the clicked card
+                    const clickedCardClone = card.cloneNode(true);
+
+                    // Remove the original card from the UI and array
+                    shownCardSlots[index].removeChild(card);
+                    reserveCards.splice(index, 1);
+
+                    // Push the clone to the mainHand array
+                    mainHand.push(clickedCardClone);
+
+                    // Update UI
+                    displayMainHand();
+                    displayHiddenCards();
+                } else {
+                    console.log("Can't play this card right now");
+                }
+            }
+        });
     });
 }
 
@@ -273,11 +371,31 @@ function cardValue(card) {
     return cards.sort((a, b) => cardValue(a) - cardValue(b));
 }
 
+function removeEventListenersFromCard(card) {
+    const cardFrontElem = card.querySelector('.card-front');
+    const newCard = card.cloneNode(true); // Clone the card to preserve its content
+
+    // Replace the old card with the new card (removing event listeners)
+    card.parentNode.replaceChild(newCard, card);
+
+    return newCard; // Return the new card without event listeners
+}
+
 //   Displays mainHand array in order from least to greatest, with similar cards grouped
   function displayMainHand() {
     // Sorting Cards
     clearMainHandSlots();
     sortCards(mainHand);
+
+    if (drawDeck.length === 0 && hiddenCards.length !== 0 && mainHand.length === 1 ) {
+        if (!hasPlayableCards(mainHand)) {
+            setTimeout(() => {
+                pickUpDeck();
+                console.log("Picked up deck");
+                displayCenterDeck();
+                }, 200);
+        }
+    }
 
     const mainHandElem = document.querySelector('.main-hand-container');
 
@@ -328,7 +446,11 @@ function cardValue(card) {
         // Add a click event listener to the front card image
         cardFrontElem.addEventListener('click', () => {
             if (drawDeck.length === 0) {
-                drawCardFromMainHand(card);
+                if (cardPlayability(card)) {
+                    drawCardFromMainHand(card);
+                } else {
+                    console.log("card cannot be played");
+                }
             } else if(mainHand.length >=3){
                 if (cardPlayability(card)) {
                     drawCardFromMainHand(card);
@@ -367,14 +489,14 @@ function drawCardFromMainHand(cardId) {
         const removedCard = mainHand.splice(cardIndex, 1)[0];
          // Splice returns an array, so we take the first (and only) element
         if (currentPhase === 0) {
-            if (hiddenCards.length <5) {
+            if (reserveCards.length <2) {
             // Push the removed card to centerDeck
                 const cardFrontElem = cardId.querySelector('.card-front');
 
                 cardFrontElem.style.marginTop = '0'; // Reset margin-top
                 cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
 
-                hiddenCards.push(removedCard);
+                reserveCards.push(removedCard);
                 displayHiddenCards();
             } else {
                 const cardFrontElem = cardId.querySelector('.card-front');
@@ -382,7 +504,7 @@ function drawCardFromMainHand(cardId) {
                 cardFrontElem.style.marginTop = '0'; // Reset margin-top
                 cardFrontElem.style.transform = 'rotateY(0deg)'; // Reset rotation
     
-                hiddenCards.push(removedCard);
+                reserveCards.push(removedCard);
                 displayHiddenCards();
 
                 currentPhase = 1
@@ -405,6 +527,7 @@ function drawCardFromMainHand(cardId) {
     } else {
         console.log("Card not found in mainHand.");
     }
+    displayHiddenCards();
 }
 
 
@@ -474,9 +597,9 @@ function cardPlayability(card) {
 }
 
 //Checks if there are any playable cards (returns true or false)
-function hasPlayableCards(mainHand) {
-    for (let i = 0; i < mainHand.length; i++) {
-        if (cardPlayability(mainHand[i])) {
+function hasPlayableCards(array) {
+    for (let i = 0; i < array.length; i++) {
+        if (cardPlayability(array[i])) {
             return true;
         }
     }
@@ -484,13 +607,18 @@ function hasPlayableCards(mainHand) {
 }
 
 // Move cards from the center deck to the main hand
+// Move cards from the center deck to the main hand
 function pickUpDeck() {
     while (centerDeck.length > 0) {
-        const card = centerDeck.pop();
+        const card = centerDeck.pop(); // Declare card here
+        const cardFrontElem = card.querySelector('.card-front');
+        cardFrontElem.style.marginTop = '0';
+        cardFrontElem.style.transform = 'rotateY(0deg)';
         mainHand.push(card);
         displayMainHand();
     }
 }
+
 // Move cards from the center deck to the garbage deck
 function blowUpDeck() {
     while (centerDeck.length > 0) {
@@ -501,7 +629,18 @@ function blowUpDeck() {
     }
     displayTrashDeck();
 }
+function DestroyDrawDeck() {
+    while (drawDeck.length > 0) {
+        const card = drawDeck.pop();
+        garbageDeck.push(card);
+        displayMainHand();
+        displayCenterDeck();
+    }
+    displayDrawDeck();
+    displayTrashDeck();
+}
 
+// similar to the displayDrawDeck, shows a backimage for the trashDeck if .length > 0
 function displayTrashDeck() {
     const trashDeckElem = document.querySelector('.card-pos-trashDeck'); // Get the draw deck element
     trashDeckElem.innerHTML = ''; // Clear the draw deck element
