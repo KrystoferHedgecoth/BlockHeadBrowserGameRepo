@@ -313,8 +313,8 @@ function displayHiddenCards() {
         shownCardSlots[index].appendChild(card);
 
         // Add a click event listener to the card
-        if (drawDeck.length === 0 && mainHand.length < 3) {
-            if (hasPlayableCards(reserveCards)) {
+        if (drawDeck.length === 0 && mainHand.length < 3 && mainHand.length !== 0) {
+            if (hasPlayableCards(mainHand)) {
                 console.log("Has playable cards")
             } else {
 
@@ -387,7 +387,7 @@ function removeEventListenersFromCard(card) {
     clearMainHandSlots();
     sortCards(mainHand);
 
-    if (drawDeck.length === 0 && hiddenCards.length !== 0 && mainHand.length < 3 ) {
+    if (drawDeck.length === 0 && hiddenCards.length !== 0 && mainHand.length < 3 && mainHand.length !== 0 ) {
         if (!hasPlayableCards(mainHand)) {
             setTimeout(() => {
                 pickUpDeck();
