@@ -23,7 +23,7 @@ function addChildElement(parentElem, childElem) {
     parentElem.appendChild(childElem);
 }
 
-const cardBackImgPath = '/images/cardBack/greyback.png';
+const cardBackImgPath = 'images/cardBack/greyback.png';
 
 // Selecting the card container
 const cardContainerElem = document.querySelector('.card-container');
@@ -72,7 +72,7 @@ function startRound() {
     console.log("Round hit");
     displayDrawDeck();
     drawCards();
-    // DestroyDrawDeck();
+    DestroyDrawDeck();
 }
 
 // Creating cards based on card definitions
@@ -547,7 +547,7 @@ function clearMainHandSlots() {
     cardSlots.forEach(slot => {
         while (slot.firstChild){
             slot.removeChild(slot.firstChild);
-        }
+        }cardPlayability
     })
 }
 
